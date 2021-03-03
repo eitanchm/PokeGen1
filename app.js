@@ -23,3 +23,14 @@ function toggleMenu() {
 
 /* Event listener */
 toggle.addEventListener("click", toggleMenu, false);
+
+
+/* Pokemon grid functionality */
+
+const pokemonCard = document.querySelector(".pokemon-card");
+
+/* Fill card with information and HTML */
+
+function getPokemon() {
+    
+}

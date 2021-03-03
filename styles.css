@@ -9,15 +9,26 @@
 body {
     margin: 0;
     font-family: 'Poppins', sans-serif;
-}
-
-h1 {
-    color: red;
+    background-color: #EAF4D3;
 }
 
 a, a:hover, a:focus, a:active {
     text-decoration: none;
     color: inherit;
+}
+
+.site {
+    padding: 1rem 2.5%;
+    text-align: center;
+    color: #252323;
+}
+
+.separator-line {
+    display: block;
+    width: 10%;
+    height: .25rem;
+    background-color: #252323;
+    margin: .75rem auto;
 }
 
 /* End of general CSS */
@@ -124,3 +135,6 @@ a, a:hover, a:focus, a:active {
 
 /* Start of pokemon page CSS */
 
+.grid-container {
+    width: 100%;
+}
