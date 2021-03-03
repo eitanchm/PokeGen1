@@ -3,16 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gen 1 Pokemons</title>
+    <title>Gen 1 Pokémons</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==" crossorigin="anonymous" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar">
-        <div class="navbar__container">
-            <a href="/" id="navbar__logo">GEN1</a>
-            <div class="navbar__toggle" id="mobile-menu"></div>
-        </div>
+        <ul class="menu">
+            <li class="logo"><a href="/index.html"><i class="fas fa-gamepad"></i></a></li>
+            <div class="item-container">
+                <li class="item"><a href="#" class="current">Home</a></li>
+                <li class="item"><a href="pokemons.html">Pokémons</a></li>
+                <li class="item"><a href="#">About</a></li>
+            </div>
+            <li class="toggle"><a href="#"><i class='fas fa-bars'></i></a></li>
+        </ul>
     </nav>
-    <h1>Placeholder</h1>
+    <script src="./app.js"></script>
 </body>
 </html>
