@@ -12,6 +12,10 @@ body {
     background-color: #FF3633;
 }
 
+h1 {
+    font-weight: 300;
+}
+
 .site {
     padding: 1rem 2.5%;
     text-align: center;
@@ -24,4 +28,24 @@ body {
 
 .grid-container {
     width: 100%;
+    padding-inline-start: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    grid-gap: 1.5rem;
+    margin-top: 1rem;
 }
+
+.pokemon-card {
+    background-color: #e0e0e0;
+    color: black;
+    overflow: auto;
+    padding: 2.5rem;
+    text-align: center;
+    border-radius: .5rem;
+}
+
+.pokemon-card img {
+    height: 10rem;
+}
+
+
