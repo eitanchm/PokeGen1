@@ -78,12 +78,12 @@ h1 {
     border-radius: 1rem;
 }
 
-.close {
+.closeBtn {
     float: right;
     font-size: 2rem;
 }
 
-.close:hover, close:focus {
+.closeBtn:hover, .closeBtn:focus {
     color: black;
     text-decoration: none;
     cursor: pointer;

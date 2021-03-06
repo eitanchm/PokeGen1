@@ -1,6 +1,7 @@
 /* Pokemon grid functionality */
 
 const grid = document.querySelector(".grid-container");
+let closeBtn = document.querySelector(".closeBtn")
 
 /** Function to fetch pokemons from PokeAPI and fill pokemon card with info and HTML */
 async function asyncFetchPokemon() {
@@ -14,7 +15,7 @@ async function asyncFetchPokemon() {
             })
             // Build a pokemon object
             .then(data => {
-                const pokemon = {};
+                let pokemon = {};
                 pokemon['name'] = data.name;
                 pokemon['image'] = data.sprites.front_default;
                 pokemon['types'] = data.types;
@@ -38,21 +39,43 @@ async function asyncFetchPokemon() {
 /* Function call */
 asyncFetchPokemon();
 
+
 /** Function that triggers on click, and displays detailed information about the pokemon */
-function displayPokemonInfo(pokemonID) {
+function displayPokemonInfo(pokemonId) {
     let pokemonInfo = document.querySelector(".pokemon-info-container");
+    let url = `https://pokeapi.co/api/v2/pokemon/${pokemonId}`;
+
+    fetch(url)
+        .then(res => {
+            return res.json();
+        })
+        .then(data => {
+            let pokemon = {}
+            pokemon['name'] = data.name;
+            pokemon['image'] = data.sprites.front_default;
+            pokemon['types'] = data.types;
+            // Make a readable string of all the pokemon's types
+            let types = '';
+            for (i in pokemon['types']) {
+                types += `${pokemon['types'][i].type.name}, `;
+            }
+            // Remove the last ', '
+            types = types.slice(0, -2);
+
+        });
     pokemonInfo.classList.add("visible");
 }
 
-// Closing the pokemon info window
-const closeButton = document.querySelector(".close");
-console.log(closeButton);
-
+/** This function closes the pokemon detailed information pop-up */
 function closePokemonInfo() {
     let pokemonInfo = document.querySelector(".pokemon-info-container");
     pokemonInfo.classList.remove("visible");
-    console.log("doneafasdf");
 }
 
-// Event listener
-closeButton.addEventListener("click", closePokemonInfo, false);
+/** This function will close the pokemon info window when clicked outside the modal box */
+window.addEventListener("click", function(e) {
+    let pokemonInfo = document.querySelector(".pokemon-info-container");
+    if (e.target == pokemonInfo) {
+        closePokemonInfo();
+    }
+})
