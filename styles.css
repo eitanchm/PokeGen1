@@ -45,10 +45,24 @@ h1 {
     border: none;
     outline: none;
     cursor: pointer;
+    transition: .2s;
+}
+
+.pokemon-card:hover {
+    transform:scale(1.2);
+    background-color: #ccc;
+    box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.6);
 }
 
 .pokemon-card img {
     height: 10rem;
+}
+
+.div-line {
+    width: 10%;
+    height: .2rem;
+    margin: .5rem auto;
+    background-color: #FF3633;
 }
 
 /* Start Pokemon info box (onClick) CSS */
@@ -70,21 +84,46 @@ h1 {
     display: block;
 }
 
+/* Start Pokemon info box content CSS */
+
 .pokemon-info-content {
-    margin: 10% auto;
+    margin: 5% auto;
     background-color: #e0e0e0;
     padding: 2rem;
     width: 60rem;
     border-radius: 1rem;
+    color: black;
+    display: flex;
+    flex-direction: row;
 }
 
 .closeBtn {
+    display: none;
     float: right;
+    flex: 0;
     font-size: 2rem;
 }
 
 .closeBtn:hover, .closeBtn:focus {
-    color: black;
+    color: #FF3633;
     text-decoration: none;
     cursor: pointer;
+}
+
+.pokemon-info-content .left {
+    display: flex;
+    width: 25%;
+}
+
+.pokemon-info-content .left img {
+    height: 10rem;
+    margin: auto;
+}
+
+.pokemon-info-content .right {
+    width: 65%;
+}
+
+.pokemon-info-moves {
+    font-size: .75rem;
 }
