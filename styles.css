@@ -124,6 +124,7 @@ h1 {
     width: 65%;
 }
 
-.pokemon-info-moves {
+.pokemon-info-content p {
+    margin-bottom: 1rem;
     font-size: .75rem;
 }

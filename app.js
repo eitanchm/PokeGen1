@@ -36,12 +36,11 @@ function fetchPokemon() {
                 types = types.slice(0, -2);
 
                 // Add the innerHTML for each pokemon card
-                console.log('i');
                 gridHTML += `<button onclick="displayPokemonInfo(${id})" class="pokemon-card" style="order: ${id}">
                     <img src="${pokemon['image']}" /><h3 class="pokemon-name">${id}. ${pokemon['name'].charAt(0).toUpperCase() + pokemon['name'].slice(1)}
                     </h3><p class="pokemon-types">Type: ${types}</p></button>`;
                 
-                // This is used because fetch works asynchronously, so we need to check inside of fetch
+                // This is used because fetch works asynchronously, so we need to change the grid inside of fetch
                 if (id == 151) {
                     // After loading have the invisible pokemon-info-container
                     grid.innerHTML = `<div class="pokemon-info-container" id="pokemon-info">
@@ -57,67 +56,67 @@ fetchPokemon();
 
 
 /** Function that triggers on click, and displays detailed information about the pokemon */
-function displayPokemonInfo(pokemonId) {
+async function displayPokemonInfo(pokemonId) {
     let pokemonInfo = document.querySelector(".pokemon-info-container");
     let url = `https://pokeapi.co/api/v2/pokemon/${pokemonId}`;
 
-    fetch(url)
-        .then(res => {
-            return res.json();
-        })
-        .then(data => {
-            let pokemon = {}
-            pokemon['name'] = data.name;
-            pokemon['image'] = data.sprites.front_default;
+    const response = await fetch(url);
+    const data = await response.json();
 
-            pokemon['types'] = data.types;
-            // Make a readable string of all the pokemon's types
-            let types = '';
-            for (i in pokemon['types']) {
-                types += `${pokemon['types'][i].type.name}, `;
-            }
-            // Remove the last ', '
-            types = types.slice(0, -2);
+    let pokemon = {}
+    pokemon['name'] = data.name;
+    pokemon['image'] = data.sprites.front_default;
 
-            pokemon['moves'] = data.moves;
-            // Make a readable string of the pokemon's moves
-            let moves = '';
-            let move = '';
-            for (i in pokemon['moves']) {
-                // Start with the basic information as it appears on the API
-                move = `${pokemon['moves'][i].move.name}`;
-                // Prettify the string
-                move = prettifyStr(move);
-                moves += move + ', ';
-            }
-            // Deletes the last 2 characters: ', '
-            moves = moves.slice(0, -2);
+    pokemon['types'] = data.types;
+    // Make a readable string of all the pokemon's types
+    let types = '';
+    for (i in pokemon['types']) {
+        types += `${pokemon['types'][i].type.name}, `;
+    }
+    // Remove the last ', '
+    types = types.slice(0, -2);
 
-            pokemon['games'] = data.game_indices;
-            // Make a readable string of the games that the pokemon appears in
-            let games = '';
-            let game = '';
-            for (i in pokemon['games']) {
-                // Start with information as it appears on the API response
-                game = `${pokemon['games'][i].version.name}`;
-                // Prettify the string
-                game = prettifyStr(game);
-                // Append to games string if the game doens't exist
-                if (games.search(game) == -1) {
-                    games += game + ', ';
-                }
-            }
-            // Deletes the last 2 characters: ', '
-            games = games.slice(0, -2);
+    pokemon['moves'] = data.moves;
+    // Make a readable string of the pokemon's moves
+    let moves = '';
+    let move = '';
+    for (i in pokemon['moves']) {
+        // Start with the basic information as it appears on the API
+        move = `${pokemon['moves'][i].move.name}`;
+        // Prettify the string
+        move = prettifyStr(move);
+        moves += move + ', ';
+    }
+    // Deletes the last 2 characters: ', '
+    moves = moves.slice(0, -2);
 
-            // Build the HTML structure with the prettified data from the API
-            pokemonInfo.querySelector(".pokemon-info-content").innerHTML = 
-                `<span onclick="closePokemonInfo()" class="closeBtn">&times;</span>
-                <div class="left"><img src="${pokemon['image']}" class="poke-info-img"></div>
-                <div class="right"><h3>${pokemonId}. ${pokemon['name'].charAt(0).toUpperCase() + pokemon['name'].slice(1)}</h3>
-                <h4 class="pokemon-info-type">Type: ${types}<h4/><div class="div-line"></div><p class="pokemon-info-moves">Moves: ${moves}</p>
-                </div>`;
-        });
+    pokemon['games'] = data.game_indices;
+    // Make a readable string of the games that the pokemon appears in
+    let games = '';
+    let game = '';
+    for (i in pokemon['games']) {
+        // Start with information as it appears on the API response
+        game = `${pokemon['games'][i].version.name}`;
+        // Prettify the string
+        game = prettifyStr(game);
+        // Append to games string if the game doens't exist
+        if (games.search(game) == -1) {
+            games += game + ', ';
+        }
+    }
+    // Deletes the last 2 characters: ', '
+    games = games.slice(0, -2);
+
+    const weaknesses = await getPokemonWeaknesses(types);
+
+    // Build the HTML structure with the prettified data from the API
+    pokemonInfo.querySelector(".pokemon-info-content").innerHTML = 
+        `<span onclick="closePokemonInfo()" class="closeBtn">&times;</span>
+        <div class="left"><img src="${pokemon['image']}" class="poke-info-img"></div>
+        <div class="right"><h3>${pokemonId}. ${pokemon['name'].charAt(0).toUpperCase() + pokemon['name'].slice(1)}</h3>
+        <h4 class="pokemon-info-type">Type: ${types}<h4/><div class="div-line"></div><p class="pokemon-info-moves">Moves: ${moves}</p>
+        <p class="pokemon-info-weaknesses">Weaknesses: ${weaknesses}</p></div>`;
+
     pokemonInfo.classList.add("visible");
 }
 
@@ -153,30 +152,62 @@ function prettifyStr(str) {
 
 /** This function returns a string with the weaknesses prettified. Input - pokemon type/s,
  * returns a string with the weaknesses.
+ * the way to calculate weakness: if a type takes double damage from another type x,
+ * except for when the pokemon has another type that takes half damage from the same type x.
+ * The function is async because we need to await the fetch response.
  */
-function getPokemonWeaknesses(types) {
+async function getPokemonWeaknesses(types) {
     // Build an array of the pokemon's types
     let typeArr = types.split(', ');
-    let weaknesses = ''; // Empty string of weaknesses
+    let weaknesses = '', doubleDamageFrom = [], halfDamageFrom = [], immunities = [];
     let url = '';
     
     // For each type in types find the value of double_damage_taken from pokeAPI
-    for (type in typeArr) {
+    for (i in typeArr) {
         // Set the url to fetch
-        url = `https://pokeapi.co/api/v2/type/${type}`;
+        url = `https://pokeapi.co/api/v2/type/${typeArr[i]}`;
 
-        fetch(url)
-            .then(res => {
-                return res.json();
-            })
-            .then(data => {
-                let weaknessList = data.damage_relation.double_damage_from;
-                // iterate over the elements of the list
-                for (i in weaknessList) {
-                    console.log(weaknessList[i]);
-                }
-            });
+        // Need to manipulate all the weaknesses and resistances together so needs to
+        // await the result of the API call
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        for (j in data.damage_relations.double_damage_from) {
+            // If the current double damage from type doesn't exist append it
+            if (!doubleDamageFrom.includes(data.damage_relations.double_damage_from[j].name)) {
+                doubleDamageFrom.push(data.damage_relations.double_damage_from[j].name);
+            }
+        }
+        for (j in data.damage_relations.half_damage_from) {
+            // If the current double damage from type doens't exist append it
+            if (!halfDamageFrom.includes(data.damage_relations.half_damage_from[j].name)) {
+                halfDamageFrom.push(data.damage_relations.half_damage_from[j].name);
+            }
+        }
+        // Lastly check immunitues, because they eat up every other damage relation
+        // (0*anything = 0)
+        for (j in data.damage_relations.no_damage_from) {
+            // If the current immunity doesn't exist append it
+            if (!immunities.includes(data.damage_relations.no_damage_from[j].name)) {
+                immunities.push(data.damage_relations.no_damage_from[j].name);
+            }
+        }
     }
-}
 
-getPokemonWeaknesses('fire');
+    // After getting the full lists of double damage taken and half damage taken
+    // merge the arrays to negate each other if necessary, and that gives the weaknesses.
+    console.log('double damage from: ' + doubleDamageFrom);
+    console.log('half damage from: ' + halfDamageFrom);
+    console.log('immunities: ' + immunities);
+
+    for (i in doubleDamageFrom) {
+        // For each type in double damage from, check if any of the types appear in immunities or resistances
+        // if not, it's considered a weakness, and it gets added to the weaknesses string
+        if (!halfDamageFrom.includes(doubleDamageFrom[i]) && !immunities.includes(doubleDamageFrom[i])) {
+            weaknesses += doubleDamageFrom[i] + ', ';
+        }
+    }
+    // Remove the last 2 characters: ', '.
+    weaknesses = weaknesses.slice(0, -2);
+    return weaknesses;
+}
